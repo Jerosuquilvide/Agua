@@ -1,0 +1,14 @@
+services:
+  agua: 
+    build:
+      context: ./docker
+    container_name: agua
+    environment:
+      TZ: 'America/Argentina/Buenos_Aires'
+      SERVER_NAME: ':80'
+    ports:
+      - 80:80
+    volumes:
+      - .:/app
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile
+    restart: unless-stopped

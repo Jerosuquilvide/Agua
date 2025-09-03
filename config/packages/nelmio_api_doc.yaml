@@ -1,0 +1,12 @@
+nelmio_api_doc:
+    documentation:
+        servers:
+            - url: http://localhost:80
+              description: API over HTTP
+        info:
+            title: Agua API
+            description: API para TICS
+            version: 0.0.1
+    areas:
+        path_patterns:
+            - ^/api(?!/doc$)

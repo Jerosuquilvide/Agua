@@ -1,6 +1,8 @@
 FROM composer/composer:lts-bin AS composer
 FROM dunglas/frankenphp:1-php8.4-alpine
 
+COPY --from=composer /composer /usr/bin/composer
+
 RUN apk upgrade --no-cache && \
     apk add --no-cache \
         curl \
@@ -10,9 +12,12 @@ RUN apk upgrade --no-cache && \
         gettext
 
 RUN install-php-extensions \
+		@composer \
     apcu \
     intl \
     opcache
+
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 
@@ -32,5 +37,3 @@ RUN { \
 
 RUN curl -1sLf 'https://dl.cloudsmith.io/public/symfony/stable/setup.alpine.sh' | sh \
  && apk add --no-cache symfony-cli
-
-COPY --from=composer /composer /usr/bin/composer

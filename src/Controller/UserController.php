@@ -71,4 +71,16 @@ final class UserController extends AbstractController
             return new JsonResponse('Error al guardar el usuario'.$e->getMessage(),500);
         }
     }
+
+    #[Route('/api/user/list', name: 'list_users', methods:['GET'])]
+    public function getUserList(EntityManagerInterface $em) {
+        try {
+            $userList = $em->getRepository(User::class)->findAll();
+            return new JsonResponse($userList);
+
+        } catch (\Throwable $th) {
+
+            return new JsonResponse('Error al buscar la lista de usuarios');
+        }
+    }
 }

@@ -23,28 +23,20 @@ final class UserController extends AbstractController
 
     }
 
-    #[Route('/user', name: 'app_user')]
-    public function index(): JsonResponse
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserController.php',
-        ]);
-    }
-
     #[Route('/user/create', name: 'user_create', methods:['POST'])]
     public function createUser(Request $request,UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $this->em->beginTransaction();
         try {
             $content = json_decode($request->getContent(),true);
-             if(!$content['email'] || !$content['first_name'] || !$content['last_name']) return new JsonResponse('Faltan parámetros',412);
+             if(!$content['email'] || !$content['first_name'] || !$content['last_name'] || !$content['username']) return new JsonResponse('Faltan parámetros',412);
 
             $emailBD = $this->em->getRepository(User::class)->findBy(['email' => $content['email']]);
             if(count($emailBD) > 0)  return new JsonResponse('Ya existe una cuenta con ese email',500);
 
             $user = new User();
             $user->setActive(true);
+            $user->setUsername($content['username']);
             $user->setFirstName($content['first_name']);
             $user->setIsSuperuser(false);
             $user->setLastName($content['last_name']);
@@ -59,6 +51,7 @@ final class UserController extends AbstractController
             $user->setDepartment($content['department']);
             $user->setPositionTitle($content['position_title']);
             $user->setCreatedAt(DateTimeImmutable::createFromFormat("Y-m-d", date("Y-m-d")));
+            $user->setUpdatedAt(DateTimeImmutable::createFromFormat("Y-m-d", date("Y-m-d")));
             $user->setDocumentNumber($content['document_number']);
             $user->setDocumentType($content['document_type']);
             $user->setEmail($content['email']);

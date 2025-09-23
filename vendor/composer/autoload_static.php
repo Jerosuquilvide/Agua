@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019
+class ComposerStaticInitbb2b1ae63b5caf83f246adf537df3313
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -128,8 +128,13 @@ class ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019
             'PhpParser\\' => 10,
             'PHPStan\\PhpDocParser\\' => 21,
         ),
+        'O' => 
+        array (
+            'OpenApi\\' => 8,
+        ),
         'N' => 
         array (
+            'Nelmio\\ApiDocBundle\\' => 20,
             'Negotiation\\' => 12,
         ),
         'M' => 
@@ -514,6 +519,14 @@ class ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019
         'PHPStan\\PhpDocParser\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpstan/phpdoc-parser/src',
+        ),
+        'OpenApi\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zircote/swagger-php/src',
+        ),
+        'Nelmio\\ApiDocBundle\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/nelmio/api-doc-bundle/src',
         ),
         'Negotiation\\' => 
         array (
@@ -1932,9 +1945,9 @@ class ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit04ee08ee181efe5a2ba5189b75fc0019::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitbb2b1ae63b5caf83f246adf537df3313::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitbb2b1ae63b5caf83f246adf537df3313::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitbb2b1ae63b5caf83f246adf537df3313::$classMap;
 
         }, null, ClassLoader::class);
     }

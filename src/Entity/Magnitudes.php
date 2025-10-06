@@ -23,9 +23,7 @@ class Magnitudes
     private ?string $name_en = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $abbreviation = null;
-
-  
+    private ?string $abbreviation = null;  
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $wqx_code = null;
@@ -48,18 +46,25 @@ class Magnitudes
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
     private ?string $max_value = null;
 
-    /**
-     * @var Collection<int, units>
-     */
-    #[ORM\OneToMany(targetEntity: units::class, mappedBy: 'magnitudes')]
-    private Collection $unit_id;
+    #[ORM\OneToMany(targetEntity: SensorMagnitudes::class, mappedBy: 'magnitude', cascade: ['persist', 'remove'])]
+    private ?Collection $sensorMagnitudes = null;
+    
+    #[ORM\ManyToOne(targetEntity: Units::class, inversedBy: 'magnitudes')]
+    #[ORM\JoinColumn(nullable: false)]
+    private Units $unit;
 
-    #[ORM\ManyToOne(inversedBy: 'magnitude_id')]
-    private ?SensorMagnitudes $sensorMagnitudes = null;
+    #[ORM\OneToMany(targetEntity: LocationMagnitudes::class, mappedBy: 'magnitude', cascade: ['persist', 'remove'])]
+    private ?Collection $locationMagnitudes = null; 
+
+    #[ORM\OneToMany(targetEntity: MeasuredValues::class, mappedBy: 'magnitude', cascade: ['persist', 'remove'])]
+    private ?Collection $measuredValues = null; 
+    
 
     public function __construct()
     {
-        $this->unit_id = new ArrayCollection();
+        $this->sensorMagnitudes = new ArrayCollection();
+        $this->locationMagnitudes = new ArrayCollection();
+        $this->measuredValues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -106,18 +111,6 @@ class Magnitudes
     public function setAbbreviation(string $abbreviation): static
     {
         $this->abbreviation = $abbreviation;
-
-        return $this;
-    }
-
-    public function getUnitId(): ?int
-    {
-        return $this->unit_id;
-    }
-
-    public function setUnitId(int $unit_id): static
-    {
-        $this->unit_id = $unit_id;
 
         return $this;
     }
@@ -206,37 +199,90 @@ class Magnitudes
         return $this;
     }
 
-    public function addUnitId(units $unitId): static
-    {
-        if (!$this->unit_id->contains($unitId)) {
-            $this->unit_id->add($unitId);
-            $unitId->setMagnitudes($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUnitId(units $unitId): static
-    {
-        if ($this->unit_id->removeElement($unitId)) {
-            // set the owning side to null (unless already changed)
-            if ($unitId->getMagnitudes() === $this) {
-                $unitId->setMagnitudes(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getSensorMagnitudes(): ?SensorMagnitudes
+    public function getSensorMagnitudes(): Collection
     {
         return $this->sensorMagnitudes;
     }
 
-    public function setSensorMagnitudes(?SensorMagnitudes $sensorMagnitudes): static
+    public function setSensorMagnitudes(?Collection $sensorMagnitudes): static
     {
         $this->sensorMagnitudes = $sensorMagnitudes;
 
         return $this;
+    }
+
+    public function addSensorMagnitude(SensorMagnitudes $sensorMagnitude): static
+    {
+        $this->sensorMagnitudes->add($sensorMagnitude);
+
+        return $this;
+    }
+
+    public function getUnit(): Collection
+    {
+        return $this->unit;
+    }
+
+    public function setUnit(?Units $unit): static
+    {
+        $this->unit = $unit;
+
+        return $this;
+    }
+
+
+    public function getLocationMagnitudes(): Collection
+    {
+        return $this->locationMagnitudes;
+    }
+
+    public function setLocationMagnitudes(?Collection $locationMagnitudes): static
+    {
+        $this->locationMagnitudes = $locationMagnitudes;
+
+        return $this;
+    }
+
+    public function addLocationMagnitude(LocationMagnitudes $locationMagnitude): static
+    {
+        $this->locationMagnitudes->add($locationMagnitude);
+
+        return $this;
+    }
+
+    public function getMeasuredValues(): Collection
+    {
+        return $this->measuredValues;
+    }
+
+    public function setMeasuredValues(?Collection $measuredValues): static
+    {
+        $this->measuredValues = $measuredValues;
+
+        return $this;
+    }
+
+    public function addMeasuredValue(MeasuredValues $measuredValue): static
+    {
+        $this->measuredValues->add($measuredValue);
+
+        return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'    => $this->id,
+            'group_name'  => $this->group_name,
+            'name_en' => $this->name_en,
+            'abbreviation' => $this->abbreviation,
+            'wqx_code' => $this->wqx_code,
+            'wmo_code' => $this->wmo_code,
+            'iso_ieee_code' => $this->iso_ieee_code,
+            'decimals' => $this->decimals,
+            'allow_negative' => $this->allow_negative,
+            'min_value' => $this->min_value,
+            'max_value' => $this->max_value            
+        ];        
     }
 }

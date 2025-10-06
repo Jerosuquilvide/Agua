@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
+use App\Entity\Users;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -23,7 +23,7 @@ final class UserController extends AbstractController
 
     }
 
-    #[Route('/user/create', name: 'user_create', methods:['POST'])]
+    #[Route('/users/create', name: 'user_create', methods:['POST'])]
     public function createUser(Request $request,UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $this->em->beginTransaction();
@@ -31,10 +31,10 @@ final class UserController extends AbstractController
             $content = json_decode($request->getContent(),true);
              if(!$content['email'] || !$content['first_name'] || !$content['last_name'] || !$content['username']) return new JsonResponse('Faltan parámetros',412);
 
-            $emailBD = $this->em->getRepository(User::class)->findBy(['email' => $content['email']]);
+            $emailBD = $this->em->getRepository(Users::class)->findBy(['email' => $content['email']]);
             if(count($emailBD) > 0)  return new JsonResponse('Ya existe una cuenta con ese email',500);
 
-            $user = new User();
+            $user = new Users();
             $user->setActive(true);
             $user->setUsername($content['username']);
             $user->setFirstName($content['first_name']);
@@ -72,15 +72,14 @@ final class UserController extends AbstractController
         }
     }
 
-    #[Route('/api/user/list', name: 'list_users', methods:['GET'])]
+    #[Route('/api/users/list', name: 'list_users', methods:['GET'])]
     public function getUserList(EntityManagerInterface $em) {
         try {
-            $userList = $em->getRepository(User::class)->findAll();
-            return new JsonResponse($userList);
+            $userList = $this->em->getRepository(Users::class)->findAll();
+            return new JsonResponse(array_map(fn($user) => $user->jsonSerialize(), $userList), 200);
 
-        } catch (\Throwable $th) {
-
-            return new JsonResponse('Error al buscar la lista de usuarios');
+        } catch (Exception $e) {
+            return new JsonResponse('Error al buscar la lista de usuarios: '.$e->getMessage(), 500);
         }
     }
 }

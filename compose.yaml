@@ -12,3 +12,15 @@ services:
       - .:/app
       - ./docker/Caddyfile:/etc/caddy/Caddyfile
     restart: unless-stopped
+  db:
+      image: postgres:17.6
+      environment:
+        POSTGRES_DB: devdb
+        POSTGRES_USER: devuser
+        POSTGRES_PASSWORD: devpass
+      ports:
+        - "5433:5433"
+      volumes:
+        - db_data:/var/lib/postgresql/data
+volumes:
+  db_data:

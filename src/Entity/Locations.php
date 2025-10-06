@@ -7,9 +7,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use JsonSerializable;
 
 #[ORM\Entity(repositoryClass: LocationsRepository::class)]
-class Locations
+class Locations implements JsonSerializable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -40,14 +41,20 @@ class Locations
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\OneToOne(mappedBy: 'location_id', cascade: ['persist', 'remove'])]
-    private ?Measurements $measurements = null;
+    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'location', cascade: ['persist', 'remove'])]
+    private ?Collection $measurements = null;
 
+    #[ORM\OneToMany(targetEntity: LocationSensors::class, mappedBy: 'location', cascade: ['persist', 'remove'])]
+    private ?Collection $locationSensor = null;
 
+    #[ORM\OneToMany(targetEntity: LocationMagnitudes::class, mappedBy: 'location', cascade: ['persist', 'remove'])]
+    private ?Collection $locationMagnitude = null;
 
     public function __construct()
     {
-        $this->borrar = new ArrayCollection();
+        $this->measurements = new ArrayCollection();
+        $this->locationSensor = new ArrayCollection();
+        $this->locationMagnitude = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -91,7 +98,7 @@ class Locations
         return $this->lat_dd;
     }
 
-    public function setLatDd(string $lat_dd): static
+    public function setLatDd(?string $lat_dd): static
     {
         $this->lat_dd = $lat_dd;
 
@@ -103,7 +110,7 @@ class Locations
         return $this->lon_dd;
     }
 
-    public function setLonDd(?string $lon_dd): static
+    public function setLonDd(string $lon_dd): static
     {
         $this->lon_dd = $lon_dd;
 
@@ -158,29 +165,76 @@ class Locations
         return $this;
     }
 
-    /**
-     * @return Collection<int, LocationMagnitudes>
-     */
-    public function getBorrar(): Collection
-    {
-        return $this->borrar;
-    }
-
-    public function getMeasurements(): ?Measurements
+    public function getMeasurements(): ?Collection
     {
         return $this->measurements;
     }
 
-    public function setMeasurements(Measurements $measurements): static
+    public function setMeasurements(?Collection $measurements): static
     {
-        // set the owning side of the relation if necessary
-        if ($measurements->getLocationId() !== $this) {
-            $measurements->setLocationId($this);
-        }
-
         $this->measurements = $measurements;
 
         return $this;
     }
 
+    public function addMeasurement(Measurements $measurement): static
+    {
+        $this->measurements->add($measurement);
+
+        return $this;
+    }
+
+    public function getLocationSensor(): ?Collection
+    {
+        return $this->locationSensor;
+    }
+
+    public function setLocationSensor(?Collection $locationSensor): static
+    {
+        $this->locationSensor = $locationSensor;
+
+        return $this;
+    }
+
+    public function addLocationSensor(LocationSensors $locationSensor): static
+    {
+        $this->locationSensor->add($locationSensor);
+
+        return $this;
+    }
+
+    public function getLocationMagnitude(): ?Collection
+    {
+        return $this->locationMagnitude;
+    }
+
+    public function setLocationMagnitude(?Collection $locationMagnitude): static
+    {
+        $this->locationMagnitude = $locationMagnitude;
+
+        return $this;
+    }
+
+
+    public function addLocationMagnitude(LocationMagnitudes $locationMagnitude): static
+    {
+        $this->locationMagnitude->add($locationMagnitude);
+
+        return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'    => $this->id,
+            'name'  => $this->name,
+            'description' => $this->description,
+            'lat_dd' => $this->lat_dd,
+            'lon_dd' => $this->lon_dd,
+            'altitude_m' => $this->altitude_m,
+            'address' => $this->address,
+            'active' => $this->active,
+            'created_at' => $this->created_at
+        ];        
+    }
 }

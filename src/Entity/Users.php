@@ -2,15 +2,17 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
+use App\Repository\UsersRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\Entity(repositoryClass: UsersRepository::class)]
 #[ORM\Table(name: '`users`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -95,9 +97,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $last_login_at = null;
 
-    #[ORM\OneToOne(mappedBy: 'entered_by', cascade: ['persist', 'remove'])]
-    private ?Measurements $measurements = null;
+    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'entered_by', cascade: ['persist', 'remove'])]
+    private ?Collection $entered_measurements = null;
 
+    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'sampled_by', cascade: ['persist', 'remove'])]
+    private ?Collection $sampled_measurements = null;
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -445,20 +450,72 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getMeasurements(): ?Measurements
+    public function getEnteredMeasurements(): ?Measurements
     {
-        return $this->measurements;
+        return $this->entered_measurements;
     }
 
-    public function setMeasurements(Measurements $measurements): static
+    public function setEnteredMeasurements(Measurements $entered_measurements): static
     {
-        // set the owning side of the relation if necessary
-        if ($measurements->getEnteredBy() !== $this) {
-            $measurements->setEnteredBy($this);
-        }
-
-        $this->measurements = $measurements;
+        $this->entered_measurements = $entered_measurements;
 
         return $this;
     }
+
+    public function addEnteredMeasurement(Measurements $entered_measurements): static
+    {
+        $this->entered_measurements->add($entered_measurements);
+
+        return $this;
+    }
+
+    public function getSampledMeasurements(): ?Measurements
+    {
+        return $this->sampled_measurements;
+    }
+
+    public function setSampledMeasurements(Measurements $sampled_measurements): static
+    {
+        $this->sampled_measurements = $sampled_measurements;
+
+        return $this;
+    }
+
+    public function addSampledMeasurement(Measurements $sampled_measurements): static
+    {
+        $this->sampled_measurements->add($sampled_measurements);
+
+        return $this;
+    }
+
+    public function jsonSerialize(): array{
+        return [
+            'id' => $this->id,
+            'email' => $this->email,
+            'username' => $this->username,
+            'active' => $this->active,
+            'role' => $this->role,
+            'is_superuser' => $this->is_superuser,
+            'first_name' => $this->first_name,
+            'last_name' => $this->last_name,
+            'document_type' => $this->document_type,
+            'document_number' => $this->document_number,
+            'address_line1' => $this->address_line1,
+            'address_line2' => $this->address_line2,
+            'city' => $this->city,
+            'state_province' => $this->state_province,
+            'postal_code' => $this->postal_code,
+            'country' => $this->country,
+            'phone' => $this->phone,
+            'organization' => $this->organization,
+            'position_title' => $this->position_title,
+            'department' => $this->department,
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'created_by_user_id' => $this->created_by_user_id,
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            'updated_by_user_id' => $this->updated_by_user_id,
+            'last_login_at' => $this->last_login_at?->format('Y-m-d H:i:s'),
+        ];
+    }
+
 }

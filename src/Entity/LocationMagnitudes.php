@@ -13,8 +13,6 @@ class LocationMagnitudes
     #[ORM\Column]
     private ?int $id = null;
 
-
-
     #[ORM\Column(nullable: true)]
     private ?float $min_acceptable = null;
 
@@ -36,25 +34,24 @@ class LocationMagnitudes
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
-    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?locations $location_id = null;
+    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'locationMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Locations $location = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?magnitudes $magnitude_id = null;
+    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'locationMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Magnitudes $magnitude = null;
 
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getLocationId(): ?int
+    public function setId(int $id): static
     {
-        return $this->location_id;
+        $this->id = $id;
+        return $this;
     }
-
-
 
     public function getMinAcceptable(): ?float
     {
@@ -64,7 +61,6 @@ class LocationMagnitudes
     public function setMinAcceptable(?float $min_acceptable): static
     {
         $this->min_acceptable = $min_acceptable;
-
         return $this;
     }
 
@@ -76,7 +72,6 @@ class LocationMagnitudes
     public function setMaxAcceptable(?float $max_acceptable): static
     {
         $this->max_acceptable = $max_acceptable;
-
         return $this;
     }
 
@@ -88,7 +83,6 @@ class LocationMagnitudes
     public function setAlertLow(?float $alert_low): static
     {
         $this->alert_low = $alert_low;
-
         return $this;
     }
 
@@ -100,7 +94,6 @@ class LocationMagnitudes
     public function setAlertHigh(?float $alert_high): static
     {
         $this->alert_high = $alert_high;
-
         return $this;
     }
 
@@ -112,7 +105,6 @@ class LocationMagnitudes
     public function setSamplingPlan(?string $sampling_plan): static
     {
         $this->sampling_plan = $sampling_plan;
-
         return $this;
     }
 
@@ -124,7 +116,6 @@ class LocationMagnitudes
     public function setRequired(bool $required): static
     {
         $this->required = $required;
-
         return $this;
     }
 
@@ -136,26 +127,45 @@ class LocationMagnitudes
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
-
         return $this;
     }
 
-    public function setLocationId(?locations $location_id): static
+    public function getLocation(): ?Locations
     {
-        $this->location_id = $location_id;
+        return $this->location;
+    }
 
+    public function setLocation(Locations $location): static
+    {
+        $this->location = $location;
         return $this;
     }
 
-    public function getMagnitudeId(): ?magnitudes
+    public function getMagnitude(): ?Magnitudes
     {
-        return $this->magnitude_id;
+        return $this->magnitude;
     }
 
-    public function setMagnitudeId(magnitudes $magnitude_id): static
+    public function setMagnitude(Magnitudes $magnitude): static
     {
-        $this->magnitude_id = $magnitude_id;
-
+        $this->magnitude = $magnitude;
         return $this;
     }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'    => $this->id,
+            'location' => isset($this->location) ? $this->location->getId() : null,
+            'magnitude' => isset($this->magnitude) ? $this->magnitude->getId() : null,
+            'min_acceptable'  => $this->min_acceptable,
+            'max_acceptable' => $this->max_acceptable,
+            'alert_low' => $this->alert_low,
+            'alert_high' => $this->alert_high,
+            'sampling_plan' => $this->sampling_plan,
+            'required' => $this->required,
+            'notes' => $this->notes,
+        ];
+    }
+
 }

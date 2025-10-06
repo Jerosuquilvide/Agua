@@ -14,17 +14,13 @@ class MeasuredValues
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Measurements $measurement_id = null;
+    #[ORM\ManyToOne(targetEntity: Measurements::class, inversedBy: 'measuredValues', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Measurements $measurement = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Magnitudes $magnitude_id = null;
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Units $unit_id = null;
+    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'measuredValues', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Magnitudes $magnitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0)]
     private ?string $value_numeric = null;
@@ -64,42 +60,29 @@ class MeasuredValues
     public function setId(int $id): static
     {
         $this->id = $id;
+        return $this;
+    }
+
+    public function getMeasurement(): ?Measurements
+    {
+        return $this->measurement;
+    }
+
+    public function setMeasurement(?Measurements $measurement): static
+    {
+        $this->measurement = $measurement;
 
         return $this;
     }
 
-    public function getMeasurementId(): ?Measurements
+    public function getMagnitude(): ?Magnitudes
     {
-        return $this->measurement_id;
+        return $this->magnitude;
     }
 
-    public function setMeasurementId(Measurements $measurement_id): static
+    public function setMagnitude(?Magnitudes $magnitude): static
     {
-        $this->measurement_id = $measurement_id;
-
-        return $this;
-    }
-
-    public function getMagnitudeId(): ?Magnitudes
-    {
-        return $this->magnitude_id;
-    }
-
-    public function setMagnitudeId(Magnitudes $magnitude_id): static
-    {
-        $this->magnitude_id = $magnitude_id;
-
-        return $this;
-    }
-
-    public function getUnitId(): ?Units
-    {
-        return $this->unit_id;
-    }
-
-    public function setUnitId(Units $unit_id): static
-    {
-        $this->unit_id = $unit_id;
+        $this->magnitude = $magnitude;
 
         return $this;
     }
@@ -222,5 +205,23 @@ class MeasuredValues
         $this->snapshot_allow_negative = $snapshot_allow_negative;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array{
+        return [
+            'id' => $this->id,
+            'measurement' => isset($this->measurement) ? $this->measurement->getId() : null,
+            'magnitude' => isset($this->magnitude) ? $this->magnitude->getId() : null,
+            'value_numeric' => $this->value_numeric,
+            'qc_flag' => $this->qc_flag,
+            'status' => $this->status,
+            'taken_at' => $this->taken_at,
+            'comments' => $this->comments,
+            'snapshot_min_acceptable' => $this->snapshot_min_acceptable,
+            'snapshot_max_acceptable' => $this->snapshot_max_acceptable,
+            'snapshot_alert_low' => $this->snapshot_alert_low,
+            'snapshot_alert_high' => $this->snapshot_alert_high,
+            'snapshot_allow_negative' => $this->snapshot_allow_negative,
+        ];
     }
 }

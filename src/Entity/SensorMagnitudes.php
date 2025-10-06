@@ -16,15 +16,13 @@ class SensorMagnitudes
     #[ORM\Column]
     private ?int $id = null;
 
-    /**
-     * @var Collection<int, Sensors>
-     */
-    #[ORM\OneToMany(targetEntity: Sensors::class, mappedBy: 'sensorMagnitudes')]
-    private Collection $sensor_id;
+    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'sensorMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Sensors $sensor = null;
 
-
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Units $unit_id = null;
+    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'sensorMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Magnitudes $magnitude = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
     private ?string $value_min = null;
@@ -36,7 +34,7 @@ class SensorMagnitudes
     private ?string $resolution = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $acurracy = null;
+    private ?string $accuracy = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $calibrated_at = null;
@@ -47,16 +45,9 @@ class SensorMagnitudes
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
-    /**
-     * @var Collection<int, Magnitudes>
-     */
-    #[ORM\OneToMany(targetEntity: Magnitudes::class, mappedBy: 'sensorMagnitudes')]
-    private Collection $magnitude_id;
-
     public function __construct()
     {
-        $this->sensor_id = new ArrayCollection();
-        $this->magnitude_id = new ArrayCollection();
+        $this->measurements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -67,61 +58,28 @@ class SensorMagnitudes
     public function setId(int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
-    /**
-     * @return Collection<int, Sensors>
-     */
-    public function getSensorId(): Collection
+    public function getSensor(): ?Sensors
     {
-        return $this->sensor_id;
+        return $this->sensor;
     }
 
-    public function addSensorId(Sensors $sensorId): static
+    public function setSensor(?Sensors $sensor): static
     {
-        if (!$this->sensor_id->contains($sensorId)) {
-            $this->sensor_id->add($sensorId);
-            $sensorId->setSensorMagnitudes($this);
-        }
-
+        $this->sensor = $sensor;
         return $this;
     }
 
-    public function removeSensorId(Sensors $sensorId): static
+    public function getMagnitude(): ?Magnitudes
     {
-        if ($this->sensor_id->removeElement($sensorId)) {
-            // set the owning side to null (unless already changed)
-            if ($sensorId->getSensorMagnitudes() === $this) {
-                $sensorId->setSensorMagnitudes(null);
-            }
-        }
-
-        return $this;
+        return $this->magnitude;
     }
 
-    public function getMagnitudeId(): ?int
+    public function setMagnitude(?Magnitudes $magnitude): static
     {
-        return $this->magnitude_id;
-    }
-
-    public function setMagnitudeId(int $magnitude_id): static
-    {
-        $this->magnitude_id = $magnitude_id;
-
-        return $this;
-    }
-
-    public function getUnitId(): ?Units
-    {
-        return $this->unit_id;
-    }
-
-    public function setUnitId(?Units $unit_id): static
-    {
-        $this->unit_id = $unit_id;
-
+        $this->magnitude = $magnitude;
         return $this;
     }
 
@@ -133,7 +91,6 @@ class SensorMagnitudes
     public function setValueMin(?string $value_min): static
     {
         $this->value_min = $value_min;
-
         return $this;
     }
 
@@ -145,7 +102,6 @@ class SensorMagnitudes
     public function setValueMax(?string $value_max): static
     {
         $this->value_max = $value_max;
-
         return $this;
     }
 
@@ -157,19 +113,17 @@ class SensorMagnitudes
     public function setResolution(?string $resolution): static
     {
         $this->resolution = $resolution;
-
         return $this;
     }
 
-    public function getAcurracy(): ?string
+    public function getaccuracy(): ?string
     {
-        return $this->acurracy;
+        return $this->accuracy;
     }
 
-    public function setAcurracy(?string $acurracy): static
+    public function setaccuracy(?string $accuracy): static
     {
-        $this->acurracy = $acurracy;
-
+        $this->accuracy = $accuracy;
         return $this;
     }
 
@@ -181,7 +135,6 @@ class SensorMagnitudes
     public function setCalibratedAt(?\DateTimeImmutable $calibrated_at): static
     {
         $this->calibrated_at = $calibrated_at;
-
         return $this;
     }
 
@@ -193,7 +146,6 @@ class SensorMagnitudes
     public function setChannelName(?string $channel_name): static
     {
         $this->channel_name = $channel_name;
-
         return $this;
     }
 
@@ -205,29 +157,22 @@ class SensorMagnitudes
     public function setNotes(?string $notes): static
     {
         $this->notes = $notes;
-
         return $this;
     }
-
-    public function addMagnitudeId(Magnitudes $magnitudeId): static
-    {
-        if (!$this->magnitude_id->contains($magnitudeId)) {
-            $this->magnitude_id->add($magnitudeId);
-            $magnitudeId->setSensorMagnitudes($this);
-        }
-
-        return $this;
+    
+    public function jsonSerialize(): array{
+        return [
+            'id' => $this->id,
+            'sensor' => isset($this->sensor) ? $this->sensor->getId() : null,
+            'magnitude' => isset($this->magnitude) ? $this->magnitude->getId() : null,
+            'value_min' => $this->value_min,
+            'value_max' => $this->value_max,
+            'resolution' => $this->resolution,
+            'accuracy' => $this->accuracy,
+            'calibrated_at' => $this->calibrated_at,
+            'channel_name' => $this->channel_name,
+            'notes' => $this->notes,
+        ];
     }
 
-    public function removeMagnitudeId(Magnitudes $magnitudeId): static
-    {
-        if ($this->magnitude_id->removeElement($magnitudeId)) {
-            // set the owning side to null (unless already changed)
-            if ($magnitudeId->getSensorMagnitudes() === $this) {
-                $magnitudeId->setSensorMagnitudes(null);
-            }
-        }
-
-        return $this;
-    }
 }

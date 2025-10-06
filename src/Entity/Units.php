@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UnitsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: UnitsRepository::class)]
@@ -14,7 +16,7 @@ class Units
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $acum_code = null;
+    private ?string $ucum_code = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $uncefact_code = null;
@@ -22,9 +24,13 @@ class Units
     #[ORM\Column(length: 255)]
     private ?string $display = null;
 
-    #[ORM\ManyToOne(inversedBy: 'unit_id')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Magnitudes $magnitudes = null;
+    #[ORM\OneToMany(targetEntity: Magnitudes::class, mappedBy: 'unit')]
+    private Collection $magnitudes;
+
+    public function __construct()
+    {
+        $this->magnitudes = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -34,19 +40,17 @@ class Units
     public function setId(int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
-    public function getAcumCode(): ?string
+    public function getUcumCode(): ?string
     {
-        return $this->acum_code;
+        return $this->ucum_code;
     }
 
-    public function setAcumCode(string $acum_code): static
+    public function setUcumCode(string $ucum_code): static
     {
-        $this->acum_code = $acum_code;
-
+        $this->ucum_code = $ucum_code;
         return $this;
     }
 
@@ -58,7 +62,6 @@ class Units
     public function setUncefactCode(?string $uncefact_code): static
     {
         $this->uncefact_code = $uncefact_code;
-
         return $this;
     }
 
@@ -70,19 +73,33 @@ class Units
     public function setDisplay(string $display): static
     {
         $this->display = $display;
-
         return $this;
     }
 
-    public function getMagnitudes(): ?Magnitudes
+    /**
+     * @return Collection<int, Magnitudes>
+     */
+    public function getMagnitudes(): Collection
     {
         return $this->magnitudes;
     }
 
-    public function setMagnitudes(?Magnitudes $magnitudes): static
+    public function addMagnitude(Magnitudes $magnitude): static
     {
-        $this->magnitudes = $magnitudes;
-
+        if (!$this->magnitudes->contains($magnitude)) {
+            $this->magnitudes->add($magnitude);
+            $magnitude->setUnit($this);
+        }
         return $this;
     }
+
+    public function jsonSerialize(): array{
+        return [
+            'id' => $this->id,
+            'ucum_code' => $this->ucum_code,
+            'uncefact_code' => $this->uncefact_code,
+            'display' => $this->display,
+        ];
+    }
+
 }

@@ -15,7 +15,9 @@ RUN install-php-extensions \
 		@composer \
     apcu \
     intl \
-    opcache
+    opcache \
+    pdo_pgsql \
+    pgsql
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 

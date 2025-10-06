@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SensorsRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SensorsRepository::class)]
@@ -37,11 +39,14 @@ class Sensors
     #[ORM\Column(length: 255)]
     private ?string $notes = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sensor_id')]
-    private ?SensorMagnitudes $sensorMagnitudes = null;
+    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'sensor', cascade: ['persist', 'remove'])]
+    private ?Collection $measurements = null;
 
-    #[ORM\OneToOne(mappedBy: 'sensor_id', cascade: ['persist', 'remove'])]
-    private ?Measurements $measurements = null;
+    #[ORM\OneToMany(targetEntity: LocationSensors::class, mappedBy: 'sensor', cascade: ['persist', 'remove'])]
+    private ?Collection $locationSensors = null;
+
+    #[ORM\OneToMany(targetEntity: SensorMagnitudes::class, mappedBy: 'sensor', cascade: ['persist', 'remove'])]
+    private ?Collection $sensorMagnitudes = null;
 
     public function getId(): ?int
     {
@@ -51,7 +56,6 @@ class Sensors
     public function setId(int $id): static
     {
         $this->id = $id;
-
         return $this;
     }
 
@@ -151,32 +155,75 @@ class Sensors
         return $this;
     }
 
-    public function getSensorMagnitudes(): ?SensorMagnitudes
+    public function getMeasurements(): ?Collection
+    {
+        return $this->measurements;
+    }
+
+    public function setMeasurements(?Collection $measurements): static
+    {
+        $this->measurements = $measurements;
+
+        return $this;
+    }
+
+    public function addMeasurement(Measurements $measurement): static
+    {
+        $this->measurements->add($measurement);
+
+        return $this;
+    }
+
+    public function getLocationSensors(): ?Collection
+    {
+        return $this->locationSensors;
+    }
+
+    public function setLocationSensors(?Collection $locationSensors): static
+    {
+        $this->locationSensors = $locationSensors;
+
+        return $this;
+    }
+
+    public function addLocationSensor(LocationSensors $locationSensor): static
+    {
+        $this->locationSensors->add($locationSensor);
+
+        return $this;
+    }
+
+    public function getSensorMagnitudes(): ?Collection
     {
         return $this->sensorMagnitudes;
     }
 
-    public function setSensorMagnitudes(?SensorMagnitudes $sensorMagnitudes): static
+    public function setSensorMagnitudes(?Collection $sensorMagnitudes): static
     {
         $this->sensorMagnitudes = $sensorMagnitudes;
 
         return $this;
     }
 
-    public function getMeasurements(): ?Measurements
+    public function addSensorMagnitude(SensorMagnitudes $sensorMagnitude): static
     {
-        return $this->measurements;
-    }
-
-    public function setMeasurements(Measurements $measurements): static
-    {
-        // set the owning side of the relation if necessary
-        if ($measurements->getSensorId() !== $this) {
-            $measurements->setSensorId($this);
-        }
-
-        $this->measurements = $measurements;
+        $this->sensorMagnitudes->add($sensorMagnitude);
 
         return $this;
     }
+
+    public function jsonSerialize(): array{
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'manufacturer' => $this->manufacturer,
+            'model' => $this->model,
+            'serial_number' => $this->serial_number,
+            'sensor_type' => $this->sensor_type,
+            'installed_at' => $this->installed_at,
+            'active' => $this->active,
+            'notes' => $this->notes
+        ];
+    }
+
 }

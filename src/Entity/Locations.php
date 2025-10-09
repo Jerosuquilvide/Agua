@@ -41,13 +41,13 @@ class Locations implements JsonSerializable
     #[ORM\Column]
     private ?\DateTimeImmutable $created_at = null;
 
-    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'location', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'location')]
     private ?Collection $measurements = null;
 
-    #[ORM\OneToMany(targetEntity: LocationSensors::class, mappedBy: 'location', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: LocationSensors::class, mappedBy: 'location')]
     private ?Collection $locationSensor = null;
 
-    #[ORM\OneToMany(targetEntity: LocationMagnitudes::class, mappedBy: 'location', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: LocationMagnitudes::class, mappedBy: 'location')]
     private ?Collection $locationMagnitude = null;
 
     public function __construct()

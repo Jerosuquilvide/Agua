@@ -107,6 +107,9 @@ final class LocationController extends AbstractController
             if (!$location) {
                 return new JsonResponse('Ubicación no encontrada',404);
             }
+            if($location->getMeasurements()->count() > 0){
+                return new JsonResponse('No se puede eliminar la ubicación porque está siendo usada por alguna medición',400);
+            }
             $this->em->remove($location);
             $this->em->flush();
             return new JsonResponse('Ubicación eliminada con éxito',200);
@@ -178,7 +181,7 @@ final class LocationController extends AbstractController
             $magnitude->setNotes($data['notes'] ? $data['notes']: null);
             $this->em->persist($magnitude);
             $this->em->flush();
-            return new JsonResponse('Magnitud creada con éxito', 201);
+            return new JsonResponse('Magnitud asociada a la ubicación con éxito', 201);
         } catch (Exception $e) {
             return new JsonResponse('Error al crear la magnitud. '.$e->getMessage() ,500);
         }
@@ -211,7 +214,7 @@ final class LocationController extends AbstractController
                 $magnitude->setRequired(isset($data['required']) ? $data['required']: $magnitude->getRequired());
                 $magnitude->setNotes(isset($data['notes']) ? $data['notes']: $magnitude->getNotes());
                 $this->em->flush();
-                return new JsonResponse('Magnitud editada con éxito',200);
+                return new JsonResponse('Magnitud de la ubicación editada con éxito',200);
             }
         } catch (Exception $e) {
             return new JsonResponse('Error al editar la magnitud. '.$e->getMessage() ,500);
@@ -236,7 +239,7 @@ final class LocationController extends AbstractController
             }else{
                 $this->em->remove($magnitude);
                 $this->em->flush();
-                return new JsonResponse('Magnitud eliminada con éxito',200);
+                return new JsonResponse('Magnitud desasociada de la ubicación con éxito',200);
             }
         } catch (Exception $e) {
             return new JsonResponse('Error al eliminar la magnitud. '.$e->getMessage() ,500);
@@ -309,7 +312,7 @@ final class LocationController extends AbstractController
             $sensor->setNotes(isset($data['notes']) ? $data['notes'] : '');
             $this->em->persist($sensor);
             $this->em->flush();
-            return new JsonResponse('Sensor agregado a la ubicación', 201);
+            return new JsonResponse('Sensor asociado a la ubicación con éxito.', 201);
         } catch (Exception $e) {
             return new JsonResponse('Error al agregar el sensor a la ubicación. '.$e->getMessage() ,500);
         }
@@ -362,7 +365,7 @@ final class LocationController extends AbstractController
             }
             $this->em->remove($sensor);
             $this->em->flush();
-            return new JsonResponse('Sensor eliminado de la ubicación con éxito', 200);
+            return new JsonResponse('Sensor desasociado de la ubicación con éxito', 200);
         } catch (Exception $e) {
             return new JsonResponse('Error al eliminar el sensor de la ubicación. '.$e->getMessage() ,500);
         }

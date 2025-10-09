@@ -120,7 +120,7 @@ final class SensorController extends AbstractController
         }
     }
 
-    #[Route('/api/sensors/{id}', name: 'delete_sensor', methods:['DELET'])]
+    #[Route('/api/sensors/{id}', name: 'delete_sensor', methods:['DELETE'])]
     public function deleteSensor(int $id) {
         try {
             if(!$id){
@@ -130,6 +130,9 @@ final class SensorController extends AbstractController
             if (!$sensor) {
                 return new JsonResponse('Sensor no encontrado',404);
             }else{
+                if($sensor->getMeasurements()->count() > 0){ 
+                    return new JsonResponse('No se puede eliminar el sensor porque está siendo utilizado por alguna medición', 409);
+                }
                 $this->em->remove($sensor);
                 $this->em->flush();
                 return new JsonResponse('Sensor eliminado con éxito',200);
@@ -207,7 +210,7 @@ final class SensorController extends AbstractController
             $sensorMagnitude->setNotes(isset($data['notes']) ? $data['notes'] : null);
             $this->em->persist($sensorMagnitude);
             $this->em->flush();            
-            return new JsonResponse('Magnitud del sensor creada con éxito', 201);
+            return new JsonResponse('Magnitud asociada al sensor con éxito', 201);
         } catch (Exception $e) {
             return new JsonResponse('Error al crear la magnitud del sensor. '.$e->getMessage() ,500);
         }
@@ -262,7 +265,7 @@ final class SensorController extends AbstractController
             }
             $this->em->remove($magnitude);
             $this->em->flush();
-            return new JsonResponse('Magnitud del sensor eliminada con éxito',200);
+            return new JsonResponse('Magnitud desasociada del sensor con éxito',200);
         } catch (Exception $e) {
             return new JsonResponse('Error al eliminar la magnitud del sensor. '.$e->getMessage() ,500);
         }

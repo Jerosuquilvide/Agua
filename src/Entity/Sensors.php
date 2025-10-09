@@ -39,13 +39,13 @@ class Sensors
     #[ORM\Column(length: 255)]
     private ?string $notes = null;
 
-    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'sensor', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: Measurements::class, mappedBy: 'sensor')]
     private ?Collection $measurements = null;
 
-    #[ORM\OneToMany(targetEntity: LocationSensors::class, mappedBy: 'sensor', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: LocationSensors::class, mappedBy: 'sensor')]
     private ?Collection $locationSensors = null;
 
-    #[ORM\OneToMany(targetEntity: SensorMagnitudes::class, mappedBy: 'sensor', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: SensorMagnitudes::class, mappedBy: 'sensor')]
     private ?Collection $sensorMagnitudes = null;
 
     public function getId(): ?int

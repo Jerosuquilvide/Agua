@@ -19,11 +19,11 @@ class LocationSensors
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
-    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'locationSensor', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'locationSensor')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Locations $location = null;
 
-    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'locationSensor', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'locationSensor')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Sensors $sensor;
 

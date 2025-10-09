@@ -14,11 +14,11 @@ class MeasuredValues
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Measurements::class, inversedBy: 'measuredValues', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Measurements::class, inversedBy: 'measuredValues')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Measurements $measurement = null;
 
-    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'measuredValues', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'measuredValues')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Magnitudes $magnitude = null;
 

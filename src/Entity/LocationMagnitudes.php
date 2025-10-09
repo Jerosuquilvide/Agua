@@ -34,11 +34,11 @@ class LocationMagnitudes
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $notes = null;
 
-    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'locationMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'locationMagnitudes')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Locations $location = null;
 
-    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'locationMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'locationMagnitudes')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Magnitudes $magnitude = null;
 

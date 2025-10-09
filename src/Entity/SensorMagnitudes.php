@@ -16,11 +16,11 @@ class SensorMagnitudes
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'sensorMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'sensorMagnitudes')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Sensors $sensor = null;
 
-    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'sensorMagnitudes', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Magnitudes::class, inversedBy: 'sensorMagnitudes')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Magnitudes $magnitude = null;
 

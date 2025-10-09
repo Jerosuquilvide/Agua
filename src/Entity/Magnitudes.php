@@ -46,19 +46,18 @@ class Magnitudes
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 0, nullable: true)]
     private ?string $max_value = null;
 
-    #[ORM\OneToMany(targetEntity: SensorMagnitudes::class, mappedBy: 'magnitude', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: SensorMagnitudes::class, mappedBy: 'magnitude')]
     private ?Collection $sensorMagnitudes = null;
     
     #[ORM\ManyToOne(targetEntity: Units::class, inversedBy: 'magnitudes')]
     #[ORM\JoinColumn(nullable: false)]
     private Units $unit;
 
-    #[ORM\OneToMany(targetEntity: LocationMagnitudes::class, mappedBy: 'magnitude', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: LocationMagnitudes::class, mappedBy: 'magnitude')]
     private ?Collection $locationMagnitudes = null; 
 
-    #[ORM\OneToMany(targetEntity: MeasuredValues::class, mappedBy: 'magnitude', cascade: ['persist', 'remove'])]
-    private ?Collection $measuredValues = null; 
-    
+    #[ORM\OneToMany(targetEntity: MeasuredValues::class, mappedBy: 'magnitude')]
+    private ?Collection $measuredValues = null;
 
     public function __construct()
     {

@@ -15,23 +15,23 @@ class Measurements
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'measurements', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Sensors::class, inversedBy: 'measurements')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Sensors $sensor = null;
 
-    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'measurements', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Locations::class, inversedBy: 'measurements')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Locations $location = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'entered_measurements', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'entered_measurements')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Users $entered_by = null;
 
-    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'sampled_measurements', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(targetEntity: Users::class, inversedBy: 'sampled_measurements')]
     #[ORM\JoinColumn(nullable: true)]
     private ?Users $sampled_by = null;
 
-    #[ORM\OneToMany(targetEntity: MeasuredValues::class, mappedBy: 'measurement', cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(targetEntity: MeasuredValues::class, mappedBy: 'measurement')]
     private ?Collection $measuredValues = null; 
     
     #[ORM\Column]

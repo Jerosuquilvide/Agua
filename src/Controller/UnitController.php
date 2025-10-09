@@ -94,6 +94,10 @@ final class UnitController extends AbstractController
             if (!$unit) {
                 return new JsonResponse('Unidad no encontrada',404);
             }
+            $is_used = $unit->getMagnitudes()->count() > 0;
+            if($is_used){ 
+                return new JsonResponse('No se puede eliminar la unidad porque está siendo utilizada por alguna magnitud', 409);
+            }
             $this->em->remove($unit);
             $this->em->flush();
             return new JsonResponse('Unidad eliminada correctamente', 200);

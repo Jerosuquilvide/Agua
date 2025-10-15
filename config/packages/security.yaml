@@ -18,15 +18,12 @@ security:
             pattern: ^/api/login
             stateless: true
             provider: app_user_provider
-            # logout:
-            #     path: /api/logout
-            #     target: /api/login_check
             json_login:
-                check_path: /api/login_check
+                check_path: /api/login
                 username_path: email
+                password_path: password
                 success_handler: lexik_jwt_authentication.handler.authentication_success
                 failure_handler: lexik_jwt_authentication.handler.authentication_failure
-
         api:
             pattern:   ^/api
             stateless: true
@@ -34,6 +31,7 @@ security:
             # logout:
             #    path: app_logout
             provider: app_user_provider
+            access_denied_handler: App\Security\AccessDeniedHandler
         main:
             lazy: true
             provider: users_in_memory
@@ -48,8 +46,26 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # Rutas públicas
         - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }
+
+        # Rutas de consulta (GET) - Accesibles para ADMIN y OPERARIO
+        - { path: ^/api/.+/list$, roles: [ROLE_ADMIN, ROLE_OPERARIO], methods: [GET] }
+        - { path: ^/api/.+/\d+$, roles: [ROLE_ADMIN, ROLE_OPERARIO], methods: [GET] }
+        
+        # Rutas de Measurements - Accesibles para ADMIN y OPERARIO
+        - { path: ^/api/measurements, roles: [ROLE_ADMIN, ROLE_OPERARIO], methods: [POST, PUT, DELETE] }
+        
+        # Rutas administrativas - Solo ADMIN
+        - { path: ^/api/units, roles: ROLE_ADMIN, methods: [POST, PUT, DELETE] }
+        - { path: ^/api/magnitudes, roles: ROLE_ADMIN, methods: [POST, PUT, DELETE] }
+        - { path: ^/api/sensors, roles: ROLE_ADMIN, methods: [POST, PUT, DELETE] }
+        - { path: ^/api/locations, roles: ROLE_ADMIN, methods: [POST, PUT, DELETE] }
+        - { path: ^/api/users, roles: ROLE_ADMIN, methods: [POST, PUT, DELETE] }
+        
+        # Cualquier otra ruta de la api requiere autenticación
+        - { path: ^/api, roles: [ROLE_ADMIN, ROLE_OPERARIO] }   
+        - { path: ^/, roles: [ROLE_ADMIN, ROLE_OPERARIO] }   
 
 when@test:
     security:

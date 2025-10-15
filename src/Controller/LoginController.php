@@ -25,7 +25,7 @@ class LoginController extends AbstractController
         return $this->JWTManager->create($user);
     }
 
-    #[Route('/api/login', name: 'api_login', methods:['POST'])]
+    #[Route('/api/login_check', name: 'api_login_check', methods:['POST'])]
     public function index(#[CurrentUser] ?Users $user)
     {
         if (null === $user) {

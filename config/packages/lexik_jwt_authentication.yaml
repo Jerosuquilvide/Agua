@@ -5,7 +5,7 @@ lexik_jwt_authentication:
     user_id_claim: email
     token_ttl: 900 # tiempo de vida de 15 minutos
     api_platform:
-        check_path: /api/login
+        check_path: /api/login_check
         username_path: email
         password_path: password
     token_extractors:

@@ -54,16 +54,16 @@ else
 fi
 
 # Hacer dump de env productivo
-if [ ! -f ".env.local.php" ]; then
-  log "Dump de env para producción.."
-  composer dump-env prod
-else
-  log "Dump de env existente, skip.."
-fi
+# if [ ! -f ".env.local.php" ]; then
+#   log "Dump de env para producción.."
+#   composer dump-env prod
+# else
+#   log "Dump de env existente, skip.."
+# fi
 
 # Caché
-log "Warmup de caché.."
-php bin/console cache:warmup --no-interaction || true
+# log "Warmup de caché.."
+# php bin/console cache:warmup --no-interaction || true
 
 # Iniciar servicios
 log "Iniciando servicios.."

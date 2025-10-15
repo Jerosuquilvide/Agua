@@ -9,15 +9,16 @@ RUN apk upgrade --no-cache && \
         tzdata \
         acl \
         file \
-        gettext
+        gettext \
+        postgresql-client
 
 RUN install-php-extensions \
 		@composer \
-    apcu \
-    intl \
-    opcache \
-    pdo_pgsql \
-    pgsql
+		apcu \
+		intl \
+		opcache \
+		pdo_pgsql \
+		pgsql
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
